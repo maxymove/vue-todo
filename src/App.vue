@@ -2,11 +2,30 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link :to="{ name: 'Register' }">Register</router-link> |
+      <router-link :to="{ name: 'Login' }">Login</router-link> |
+      <router-link to="/about">About</router-link> |
+      <button @click="signOut">sign out</button>
     </div>
     <router-view/>
   </div>
 </template>
+
+<script>
+import { mapActions } from 'vuex';
+
+export default {
+  methods: {
+    ...mapActions(['onAuthChangedAction', 'signOutAction']),
+    signOut() {
+      this.signOutAction();
+    },
+  },
+  mounted() {
+    this.onAuthChangedAction();
+  },
+};
+</script>
 
 <style>
 #app {
