@@ -1,20 +1,20 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link :to="{ name: 'Register' }">Register</router-link> |
-      <router-link :to="{ name: 'Login' }">Login</router-link> |
-      <router-link to="/about">About</router-link> |
-      <button @click="signOut">sign out</button>
+  <v-app id="app">
+    <div><nav-bar></nav-bar></div>
+    <div>
+      <v-btn @click="signOut">sign out</v-btn>
     </div>
-    <router-view/>
-  </div>
+  </v-app>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
+import NavBar from './components/NavBar.vue';
 
 export default {
+  components: {
+    NavBar,
+  },
   methods: {
     ...mapActions(['onAuthChangedAction', 'signOutAction']),
     signOut() {
@@ -28,7 +28,7 @@ export default {
 </script>
 
 <style>
-#app {
+/* #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -47,5 +47,5 @@ export default {
 
 #nav a.router-link-exact-active {
   color: #42b983;
-}
+} */
 </style>

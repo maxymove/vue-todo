@@ -14,6 +14,8 @@ export default new Vuex.Store({
       data: null,
     },
     todos: [],
+    filter: 'all',
+    activeRemaining: null,
   },
   getters: {
     currentUser(state) {
@@ -24,6 +26,14 @@ export default new Vuex.Store({
     },
     currentTodos(state) {
       return state.todos;
+    },
+    filteredTodos(state) {
+      if (state.filter === 'all') {
+        return state.todos;
+      } if (state.filter === 'active') {
+        return state.todos.filter((todo) => !todo.isDone);
+      }
+      return state.todos.filter((todo) => todo.isDone);
     },
   },
   mutations: {
@@ -40,6 +50,12 @@ export default new Vuex.Store({
     setTodos(state, payload) {
       state.todos = payload;
     },
+    setFilter(state, payload) {
+      state.filter = payload;
+    },
+    clearTodos(state) {
+      state.todos = [];
+    },
   },
   actions: {
     // AUTHENTICATION
@@ -50,20 +66,23 @@ export default new Vuex.Store({
           const { user } = userCredential;
           console.log(user);
           // register user into databse by users/user{uid}
-          db.collection('users').doc(user.uid).collection('todos').add({
-          })
-            .then((docRef) => {
-              console.log('Document written with ID: ', docRef.id);
-            })
-            .catch((error) => {
-              console.error('Error adding document: ', error);
-            });
+          // router.replace('/Login');
+
+          // db.collection('users').doc(user.uid).collection('todos').add({
+          // })
+          //   .then((docRef) => {
+          //     console.log('Document written with ID: ', docRef.id);
+          //   })
+          //   .catch((error) => {
+          //     console.error('Error adding document: ', error);
+          //   });
         })
         .catch((error) => {
           // const errorCode = error.code;
           // const errorMessage = error.message;
           console.log(error);
         });
+      router.replace('/Login');
     },
 
     signInAction(context, payload) {
@@ -90,6 +109,7 @@ export default new Vuex.Store({
         // An error happened.
         console.log(error);
       });
+      context.commit('clearTodos');
     },
 
     onAuthChangedAction(context) {
@@ -116,9 +136,11 @@ export default new Vuex.Store({
         isHidden: false,
         timestamp: new Date().toISOString(),
         subtask: [],
+        progress: '0',
       })
         .then((docRef) => {
           console.log('Document written with ID: ', docRef.id);
+          // this.dispatch('updateTodoUidAction', { uid: docRef.id });
           this.dispatch('readTodosAction');
         })
         .catch((error) => {
@@ -132,11 +154,47 @@ export default new Vuex.Store({
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, ' => ', doc.data());
-            tmpTodos.push(doc.data());
+            // console.log(doc.id, ' => ', doc.data());
+            // console.log(doc.id);
+            const tmpDocData = doc.data();
+            tmpDocData.uid = doc.id;
+            tmpTodos.push(tmpDocData);
           });
         });
       context.commit('setTodos', tmpTodos);
+    },
+
+    updateTodoAction(context, payload) {
+      const washingtonRef = db.collection('users').doc(this.getters.currentUser.uid).collection('todos').doc(payload.uid);
+
+      // Set the "capital" field of the city 'DC'
+      return washingtonRef.update({
+        isDone: payload.isDone,
+      })
+        .then(() => {
+          console.log('Document successfully updated!');
+          this.dispatch('readTodosAction');
+        })
+        .catch((error) => {
+          // The document probably doesn't exist.
+          console.error('Error updating document: ', error);
+        });
+    },
+
+    changeFilterAction(context, payload) {
+      context.commit('setFilter', payload);
+    },
+
+    deleteTodoAction(context, payload) {
+      db.collection('users').doc(this.getters.currentUser.uid).collection('todos').doc(payload.id)
+        .delete()
+        .then(() => {
+          console.log('Document successfully deleted!');
+          this.dispatch('readTodosAction');
+        })
+        .catch((error) => {
+          console.error('Error removing document: ', error);
+        });
     },
 
   },

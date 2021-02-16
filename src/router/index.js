@@ -6,6 +6,8 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import MainApp from '../views/MainApp.vue';
 
+// import store from '../store/index';
+
 Vue.use(VueRouter);
 
 const routes = [

@@ -15,6 +15,13 @@
         required
       ></v-text-field>
 
+      <v-text-field
+
+        label="Confirm password"
+        type="password"
+        required
+      ></v-text-field>
+
       <v-btn color="success" class="mr-4" @click="signUp" >
         Sign up
       </v-btn>
