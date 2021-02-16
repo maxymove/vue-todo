@@ -10,13 +10,14 @@ export default new Vuex.Store({
   state: {
     user: {
       authenticated: false,
+      uid: null,
       data: null,
     },
     todos: [],
   },
   getters: {
     currentUser(state) {
-      return state.user.data;
+      return state.user;
     },
     authenticated(state) {
       return state.user.authenticated;
@@ -24,12 +25,14 @@ export default new Vuex.Store({
   },
   mutations: {
     setUser(state, payload) {
+      state.user.uid = payload.uid;
       state.user.data = payload;
       state.user.authenticated = payload !== null;
     },
     clearUser(state) {
       state.user.data = null;
       state.user.authenticated = false;
+      state.user.uid = null;
     },
   },
   actions: {
@@ -63,7 +66,6 @@ export default new Vuex.Store({
           // Signed in
           const { user } = userCredential;
           context.commit('setUser', user);
-          console.log(this.getters.currentUser.uid);
           router.replace('/app');
         })
         .catch((error) => {
@@ -97,6 +99,22 @@ export default new Vuex.Store({
           // ...
         }
       });
+    },
+    // other
+    createTodoAction(context, payload) {
+      db.collection('users').doc(this.getters.currentUser.uid).collection('todos').add({
+        text: payload.text,
+        isDone: false,
+        isEditing: false,
+        isHidden: false,
+        timestamp: new Date().toISOString(),
+      })
+        .then((docRef) => {
+          console.log('Document written with ID: ', docRef.id);
+        })
+        .catch((error) => {
+          console.error('Error adding document: ', error);
+        });
     },
 
   },
