@@ -22,6 +22,9 @@ export default new Vuex.Store({
     authenticated(state) {
       return state.user.authenticated;
     },
+    currentTodos(state) {
+      return state.todos;
+    },
   },
   mutations: {
     setUser(state, payload) {
@@ -33,6 +36,9 @@ export default new Vuex.Store({
       state.user.data = null;
       state.user.authenticated = false;
       state.user.uid = null;
+    },
+    setTodos(state, payload) {
+      state.todos = payload;
     },
   },
   actions: {
@@ -115,6 +121,19 @@ export default new Vuex.Store({
         .catch((error) => {
           console.error('Error adding document: ', error);
         });
+    },
+
+    readTodosAction(context) {
+      const tmpTodos = [];
+      db.collection('users').doc(this.getters.currentUser.uid).collection('todos').get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, ' => ', doc.data());
+            tmpTodos.push(doc.data());
+          });
+        });
+      context.commit('setTodos', tmpTodos);
     },
 
   },

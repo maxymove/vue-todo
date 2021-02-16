@@ -10,11 +10,17 @@
         ></v-text-field>
       </div>
     </v-container>
+
+    <v-container>
+        <div>
+            {{ currentTodos }}
+        </div>
+    </v-container>
   </v-app>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   data() {
@@ -22,18 +28,23 @@ export default {
       newTodo: '',
     };
   },
+  created() {
+    this.readTodos();
+  },
+  computed: {
+    ...mapGetters(['currentTodos']),
+  },
   methods: {
     async clearNewTodo() {
       this.newTodo = '';
     },
-    ...mapActions(['createTodoAction']),
+    ...mapActions(['createTodoAction', 'readTodosAction']),
     createTodo() {
       this.createTodoAction({ text: this.newTodo });
       this.clearNewTodo();
     },
-
     readTodos() {
-
+      this.readTodosAction();
     },
   },
 };
