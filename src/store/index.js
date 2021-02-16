@@ -85,6 +85,7 @@ export default new Vuex.Store({
       firebase.auth().signOut().then(() => {
         // Sign-out successful.
         context.commit('clearUser');
+        router.replace('/Login');
       }).catch((error) => {
         // An error happened.
         console.log(error);
@@ -114,6 +115,7 @@ export default new Vuex.Store({
         isEditing: false,
         isHidden: false,
         timestamp: new Date().toISOString(),
+        subtask: [],
       })
         .then((docRef) => {
           console.log('Document written with ID: ', docRef.id);
