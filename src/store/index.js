@@ -117,6 +117,7 @@ export default new Vuex.Store({
       })
         .then((docRef) => {
           console.log('Document written with ID: ', docRef.id);
+          this.dispatch('readTodosAction');
         })
         .catch((error) => {
           console.error('Error adding document: ', error);
